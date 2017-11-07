@@ -24,7 +24,7 @@ class Solution(object):
         self.visited.append(u)
         self.not_visited.remove(u)
 
-    def print(self):
+    def printsol(self):
         s = '['
         for i in self.visited:
             s += str(i) + ', '

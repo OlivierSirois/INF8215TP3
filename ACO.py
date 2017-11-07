@@ -23,7 +23,28 @@ class ACO(object):
         self.pheromone = np.ones((self.graph.N, self.graph.N))
 
     def get_next_city(self, sol):
-        raise NotImplementedError()
+        q = np.random.rand()
+        beta = self.parameter_beta
+        if (len(sol.visited) == 0):
+            source = 0
+        else:
+            source = sol.visited(len(sol.visited))
+        if (len(sol.not_visited) == 1):
+            nextcity = 0
+        else:
+            if q < self.parameter_q0:
+                not_visited = np.array(sol.not_visited)  
+                not_visited = np.delete(not_visited, np.where(not_visited==0))
+                nextcity = np.argmax(self.pheromone[source][not_visited] / np.power(self.graph.costs[source][not_visited], beta))
+                return not_visited[nextcity]
+            elif q >= self.parameter_q0:
+                not_visited = np.array(sol.not_visited)
+                prob = np.zeros(len(not_visited))
+                not_visited = np.delete(not_visited, np.where(not_visited==0))
+                termsum = np.sum(self.pheromone[source][not_visited] / np.power(self.graph.costs[source][not_visited], beta))
+                for j in not_visited:
+                    prob[j] = (self.pheromone[source][j] / np.power(self.graph.costs[source][j], beta))/termsum
+                return np.random.choice(not_visited, 1, p = prob[not_visited])
 
     def heuristic2opt(self, sol):
         raise NotImplementedError()

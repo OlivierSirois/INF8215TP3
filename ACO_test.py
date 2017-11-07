@@ -68,16 +68,18 @@ def test_next_city():
             c3 += 1
         elif c == 1:
             c1 += 1
+    
     assert (abs(c3 - 870) < 30)
     assert (abs(c1 - 90) < 30)
     print('ok')
 
 
 if __name__ == '__main__':
-    test_heuristic2opt()
-    test_global_update()
-    test_local_update()
+    
+    #test_heuristic2opt()
+    #test_global_update()
+    #test_local_update()
     test_next_city()
 
-    aco = ACO(0.9, 2, 0.1, 0.1, 10, 'testa')
-    aco.runACO(10)
+    #aco = ACO(0.9, 2, 0.1, 0.1, 10, 'testa')
+    #aco.runACO(10)
