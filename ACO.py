@@ -47,14 +47,39 @@ class ACO(object):
                 return np.random.choice(not_visited, 1, p = prob[not_visited])
 
     def heuristic2opt(self, sol):
-        raise NotImplementedError()
+        new_sol = Solution(sol)
+        for i in range(-1, len(sol.visited)-1):
+                for k in range(-1, len(sol.visited)-1):
+                    new_sol.inverser_ville(i, k)
+                    new_sol.cost = new_sol.get_cost(0)
+                    if new_sol.cost < sol.cost:
+                        sol.visited = new_sol.visited
+                        sol.cost = new_sol.cost
 
     def global_update(self, sol):
-        raise NotImplementedError()
+        # calcule difference to update 
+        self.best = Solution(sol)
+        L_gb = self.best.cost()
+        
+        for i in range(0,self.pheromone.shape[0]):
+            for j in range(0, self.pheromone.shape[1]):
+                self.pheromone[i][j] = (1 -self.parameter_rho)
+                for visited_best in range(0, len(self.best.visited)): 
+                        if (((i == visited_best) and (j == sol.visited[visited_best+1]))or ((j == visited_best )and i == (sol.visited[visited_best+1]))):  
+                            self.pheromone[i][j] = self.pheromone[i][j] + 1/ L_gb 
+ 
 
     def local_update(self, sol):
-        raise NotImplementedError()
-
+        #index_last_visited = sol.visited[len(sol.visited)-1]
+        i = sol.visited[len(sol.visited)-2]
+        j = sol.visited[len(sol.visited)-1]
+        if (len(sol.visited) == 1):
+            i = 0 
+        print("i is", i)
+        print("j is", j)
+        if (i != j):
+            self.pheromone[i][j] = (1 - self.parameter_phi)*self.pheromone[i][j]+ self.parameter_phi*self.pheromone_init[i][j]*self.pheromone[i][j]
+            self.pheromone[j][i] = (1 - self.parameter_phi)*self.pheromone[j][i]+ self.parameter_phi*self.pheromone_init[j][i]*self.pheromone[j][i]
     def runACO(self, maxiteration):
         raise NotImplementedError()
 
