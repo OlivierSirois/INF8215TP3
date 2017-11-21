@@ -57,17 +57,21 @@ class ACO(object):
                         sol.cost = new_sol.cost
 
     def global_update(self, sol):
-        # calcule difference to update 
-        self.best = Solution(sol)
-        L_gb = self.best.cost()
+        L_gb = sol.cost
+        best_sol = sol.visited
+
+        
         
         for i in range(0,self.pheromone.shape[0]):
             for j in range(0, self.pheromone.shape[1]):
-                self.pheromone[i][j] = (1 -self.parameter_rho)
-                for visited_best in range(0, len(self.best.visited)): 
-                        if (((i == visited_best) and (j == sol.visited[visited_best+1]))or ((j == visited_best )and i == (sol.visited[visited_best+1]))):  
-                            self.pheromone[i][j] = self.pheromone[i][j] + 1/ L_gb 
- 
+                self.pheromone[i][j] = (1 -self.parameter_rho)*self.pheromone[i][j]
+        for j in range(0, len(best_sol)):
+            if (j == 0):
+                i = 0
+            i = j-1
+            self.pheromone[best_sol[i]][best_sol[j]] = self.pheromone[best_sol[i]][best_sol[j]] + self.parameter_rho * 1/ L_gb
+            
+        self.pheromone_init = self.pheromone
 
     def local_update(self, sol):
         #index_last_visited = sol.visited[len(sol.visited)-1]
