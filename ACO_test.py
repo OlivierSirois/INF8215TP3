@@ -84,9 +84,8 @@ def test_next_city():
 if __name__ == '__main__':
     
     #test_heuristic2opt()
-    test_global_update()
+    #test_global_update()
     #test_local_update()
     #test_next_city()
-
-    #aco = ACO(0.9, 2, 0.1, 0.1, 10, 'testa')
-    #aco.runACO(10)
+    aco = ACO(0.9, 2, 0.1, 0.1, 10, 'testa')
+    aco.runACO(10)
