@@ -64,16 +64,29 @@ class ACO(object):
                             sol.visited = new_sol.visited
                             sol.cost = new_sol.cost
        
-"""
-    def global_update(self, sol):
-        raise NotImplementedError()
 
+    def global_update(self, sol):
+        # calcule difference to update 
+        self.best = Solution(sol)
+        L_gb = self.best.cost()
+        
+        for i in range(0,self.pheromone.shape[0]):
+            for j in range(0, self.pheromone.shape[1]):
+                self.pheromone[i][j] = (1 -self.parameter_rho)
+                for visited_best in range(0, len(self.best.visited)): 
+                        if (((i == visited_best) and (j == sol.visited[visited_best+1]))or ((j == visited_best )and i == (sol.visited[visited_best+1]))):  
+                            self.pheromone[i][j] = self.pheromone[i][j] + 1/ L_gb 
+                            
     def local_update(self, sol):
-        raise NotImplementedError()
+        index_last_visited = sol.shape[0]-1 
+        i = sol.visited[index_last_visited]
+        j = index_last_visited -1 
+        self.pheromone[i][j] = (1 - self.parameter_phi)*self.pheromone[i][j]+ self.parameter_phi*self.pheromone_init[i][j]*self.pheromone[i][j]
+        self.pheromone[j][i] = (1 - self.parameter_phi)*self.pheromone[j][i]+ self.parameter_phi*self.pheromone_init[j][i]*self.pheromone[j][i]
+        
 
     def runACO(self, maxiteration):
         raise NotImplementedError()
-"""
 
 # if __name__ == '__main__':
 #     aco = ACO(0.9, 2, 0.1, 0.1, 10, 'N12.data')
