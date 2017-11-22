@@ -71,15 +71,15 @@ class ACO(object):
                      self.pheromone[s[j-1]][s[j]] = (1-phi)*self.pheromone[s[j-1]][s[j]] + phi*self.pheromone_init[s[j-1]][s[j]]
                      self.pheromone[s[j]][s[j-1]] = (1-phi)*self.pheromone[s[j]][s[j-1]] + phi*self.pheromone_init[s[j]][s[j-1]]
 
-"""       
+       
        def runACO(self, maxiteration):
               solutions = Solution(self.graph)
               for k in range(0, self.parameter_K):
-              for c in range(0, len(solutions.not_visited)):
-                     if (len(solutions.visited) == 0):
-                            source = 0
-                     else:
-                            source = solutions.visited[len(solutions.visited)-1]
+                     for c in range(0, len(solutions.not_visited)):
+                            if (len(solutions.visited) == 0):
+                                   source = 0
+                            else:
+                                   source = solutions.visited[len(solutions.visited)-1]
                      print(np.argwhere(solutions.not_visited == self.get_next_city(solutions)))
                      #solutions.add_edge(source, np.argwhere(solutions.not_visited == self.get_next_city(solutions)))
               print(solutions.visited)
@@ -87,7 +87,6 @@ class ACO(object):
         #for k in range(0, self.parameter_K):
         #    solutions[k] = self.best
         # on continue..
-"""
 """            
     def global_update(self, sol):
 
