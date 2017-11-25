@@ -21,6 +21,44 @@ class ACO(object):
         self.pheromone = np.ones((self.graph.N, self.graph.N))
 
     def get_next_city(self, sol):
+        # generate random q distributed in [0:1]
+        q = np.random.rand() 
+        b = self.parameter_beta
+        if len(sol.visited) > 0:
+            source = sol.visited[-1]
+
+        else : 
+            source = 0
+        
+        if len(sol.not_visited) <= 1:
+            return 0
+        else:
+            if q < self.parameter_q0:
+                nv = np.array(sol.not_visited)
+                nv = np.delete(nv, np.where(nv == 0))
+                t = self.pheromone[source][nv]            # pheromone associated to each edge
+                c = self.graph.costs[source][nv] 
+                return nv[np.argmax(t/np.power(c, b))]
+            else:
+                nv = np.array(sol.not_visited)       
+                nv = np.delete(nv, np.where(nv==0))
+                t = self.pheromone[source][nv]                 # pheromone
+                c = np.power(self.graph.costs[source][nv], b)  # cost 
+                sm = np.sum(t/c) 
+                prob = np.divide(np.divide(t, c), sm)
+                return np.random.choice(nv, 1, p=prob)[0]
+
+    def heuristic2opt(self, sol):
+        new_sol = Solution(sol)
+        for i in range(-1, len(sol.visited)-1):
+                for k in range(-1, len(sol.visited)-1):
+                    new_sol.inverser_ville(i, k)
+                    new_sol.cost = new_sol.get_cost(0)
+                    if new_sol.cost < sol.cost:
+                        sol.visited = new_sol.visited
+                        sol.cost = new_sol.cost
+        return sol
+
         q = np.random.rand() # random distribution
         b = self.parameter_beta # relative importance of pheromone vs distance        
    
@@ -62,6 +100,7 @@ class ACO(object):
                     sol.visited = new_sol.visited
                     sol.cost = new_sol.cost           
                                     
+
     def global_update(self, sol):
         self.best = Solution(sol)
         s = sol.visited 
@@ -94,7 +133,7 @@ class ACO(object):
         #for k in range(0, self.parameter_K):
         #    solutions[k] = self.best
         # on continue..
-"""            
+            
     def global_update(self, sol):
 
         L_gb = sol.cost
@@ -107,22 +146,62 @@ class ACO(object):
                 i = 0
             i = j-1
             self.pheromone[best_sol[i]][best_sol[j]] = self.pheromone[best_sol[i]][best_sol[j]] + self.parameter_rho * 1/ L_gb
-            
-        #oui ou non ??
-        #self.pheromone_init = self.pheromone
-
     def local_update(self, sol):
-        #index_last_visited = sol.visited[len(sol.visited)-1]
-        i = sol.visited[len(sol.visited)-2]
-        j = sol.visited[len(sol.visited)-1]
         if (len(sol.visited) == 1):
             i = 0 
+
+            j = sol.visited[0]
+        elif (len(sol.visited) > 1):
+            for k in range(0, len(sol.visited)):
+                if k == 0:
+                    i = 0
+                    j = sol.visited[0]
+                    self.pheromone[i][j] = (1 - self.parameter_phi)*self.pheromone[i][j]+ self.parameter_phi*self.pheromone_init[i][j]*self.pheromone[i][j]
+                    self.pheromone[j][i] = (1 - self.parameter_phi)*self.pheromone[j][i]+ self.parameter_phi*self.pheromone_init[j][i]*self.pheromone[j][i]
+                else:                 
+                    i = sol.visited[k-1]
+                    j = sol.visited[k]
+                    self.pheromone[i][j] = (1 - self.parameter_phi)*self.pheromone[i][j]+ self.parameter_phi*self.pheromone_init[i][j]*self.pheromone[i][j]
+                    self.pheromone[j][i] = (1 - self.parameter_phi)*self.pheromone[j][i]+ self.parameter_phi*self.pheromone_init[j][i]*self.pheromone[j][i]                      
+        elif (len(sol.visited) == 0):
+            return 1
+        return 0    
+    def runACO(self, maxiteration):
+        counter = 0
+        solutions = Solution(self.graph)
+        crange = len(solutions.not_visited)
+        for m in range(0,maxiteration):
+            for k in range(0, self.parameter_K):
+                counter += 1
+                solutions = Solution(self.graph)
+                for c in range(0, crange):
+                    if (c == 0):
+                        source = 0
+                    else:
+                        source = solutions.visited[-1]
+                    nc = self.get_next_city(solutions)
+                    solutions.add_edge(source, nc)
+                solutions = self.heuristic2opt(solutions)
+                self.local_update(solutions)
+                
+                if solutions.cost < self.best.cost:
+                    self.best = solutions
+                    self.best.cost = solutions.cost
+                    print("best cost till now:", self.best.cost)
+            #self.global_update(self.best)
+            if m%10 == 0:
+                
+                print(m*100/maxiteration, "%")
+
+        self.best.printsol()
+        print("the cost", self.best.cost)            
+            
+
         print("i is", i)
         print("j is", j)
         if (i != j):
             self.pheromone[i][j] = (1 - self.parameter_phi)*self.pheromone[i][j]+ self.parameter_phi*self.pheromone_init[i][j]*self.pheromone[i][j]
             self.pheromone[j][i] = (1 - self.parameter_phi)*self.pheromone[j][i]+ self.parameter_phi*self.pheromone_init[j][i]*self.pheromone[j][i]
-"""
 
 # if __name__ == '__main__':
 #     aco = ACO(0.9, 2, 0.1, 0.1, 10, 'N12.data')
