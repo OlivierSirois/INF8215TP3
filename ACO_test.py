@@ -1,7 +1,7 @@
 from ACO import ACO
 from Solution import Solution
 import copy
-
+from time import time
 def test_heuristic2opt():
     print("testing heuristic 2opt...")
     aco = ACO(0, 0, 0, 0, 0, 'test')
@@ -65,6 +65,7 @@ def test_global_update():
 
 
 def test_next_city():
+    
     print('testing get next city...')
     aco = ACO(0.5, 2, 0, 0, 0, 'test')
     s = Solution(aco.graph)
@@ -94,8 +95,12 @@ if __name__ == '__main__':
     #test_global_update()
     #test_local_update()
     #test_next_city()
-    aco = ACO(0.9, 2, 0.01, 0.1, 10, 'testa')
-    aco.runACO(1000)
+    aco = ACO(0.7, 2, 0.01, 0.1, 10, './tsp/qatar')
+    t1 = time()
+    aco.runACO(250)
+    t2 = time()
+    td = t2-t1
+    print('Time difference: ', td)
     #print("prochaine iteration")
     #aco.runACO(1000)
     #print("prochaine iteration")
