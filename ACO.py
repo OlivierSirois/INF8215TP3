@@ -3,7 +3,7 @@ import numpy as np
 from Graph import Graph
 from Solution import Solution
 import copy
-
+from time import time 
 class ACO(object):
     def __init__(self, q0, beta, rho, phi, K, data):
         self.parameter_q0 = q0
@@ -21,7 +21,7 @@ class ACO(object):
         self.pheromone = np.ones((self.graph.N, self.graph.N))
 
     def get_next_city(self, sol):
-        # generate random q distributed in [0:1]
+
         q = np.random.rand() 
         b = self.parameter_beta
         if len(sol.visited) > 0:
@@ -52,6 +52,7 @@ class ACO(object):
     # the cost of the solution improved. If it did, then that's the new best 
     # solution. Otherwise, we keep the current solution.  
     # Repeat this process until there's no more possible exchanges. 
+    
     def heuristic2opt(self, sol):
         new_sol = Solution(sol)
         for i in range(-1, len(sol.visited)-1):
@@ -69,19 +70,10 @@ class ACO(object):
         return sol
 
     def global_update(self, sol):
-        L_gb = sol.cost
-        best_sol = sol.visited
-
-        
-        
-        for i in range(0,self.pheromone.shape[0]):
-            for j in range(0, self.pheromone.shape[1]):
-                self.pheromone[i][j] = (1 -self.parameter_rho)*self.pheromone[i][j]
-        for j in range(0, len(best_sol)):
-            if (j == 0):
-                i = 0
-            i = j-1
-            self.pheromone[best_sol[i]][best_sol[j]] = self.pheromone[best_sol[i]][best_sol[j]] + self.parameter_rho * 1/ L_gb
+        self.best = Solution(sol)
+        s = sol.visited 
+        self.pheromone = (1-self.parameter_rho)*self.pheromone
+        for j in range(0, len(s)): self.pheromone[s[j-1]][s[j]] += self.parameter_rho / self.best.cost
     def local_update(self, sol):
         s = sol.visited 
         phi = self.parameter_phi 
@@ -89,7 +81,7 @@ class ACO(object):
             self.pheromone[s[j-1]][s[j]] = (1-phi)*self.pheromone[s[j-1]][s[j]] + phi*self.pheromone_init[s[j-1]][s[j]]
             self.pheromone[s[j]][s[j-1]] = (1-phi)*self.pheromone[s[j]][s[j-1]] + phi*self.pheromone_init[s[j]][s[j-1]]
     def runACO(self, maxiteration):
-
+        t1 = time()
         best_solution_of_iteration = Solution(self.graph)
         solutions = Solution(self.graph)
         crange = len(solutions.not_visited)
@@ -114,16 +106,18 @@ class ACO(object):
                         
             best_solution_of_iteration = Solution(self.heuristic2opt(best_solution_of_iteration))       
             if best_solution_of_iteration.cost < self.best.cost:
-                self.best = Solution(best_solution_of_iteration)
                 self.global_update(self.best)
-                print("best cost till now:", self.best.cost)
+                #print("best cost till now:", self.best.cost)
             
-            if m%10 == 0:
+            #if m%20 == 0:
                 
-                print(m*100/maxiteration, "%")
+                #print(m*100/maxiteration, "%")
 
-        self.best.printsol()
-        print("the cost", self.best.cost)            
+        #self.best.printsol()
+        td = time()-t1
+        print("parameters q0 %r,beta %r, rho %r, phi %r, k %r, time %f , cost %r ", self.self.parameter_q0 , self.parameter_beta , self.parameter_rho,   self.parameter_phi , self.parameter_K , td,  self.best.cost )
+        #print("the cost", self.best.cost) 
+           
             
 
 # if __name__ == '__main__':
