@@ -73,7 +73,10 @@ class ACO(object):
         self.best = Solution(sol)
         s = sol.visited 
         self.pheromone = (1-self.parameter_rho)*self.pheromone
-        for j in range(0, len(s)): self.pheromone[s[j-1]][s[j]] += self.parameter_rho / self.best.cost
+        for j in range(0, len(s)): 
+            self.pheromone[s[j-1]][s[j]] += self.parameter_rho / self.best.cost
+            self.pheromone[s[j]][s[j-1]] += self.parameter_rho / self.best.cost
+        
     def local_update(self, sol):
         s = sol.visited 
         phi = self.parameter_phi 
