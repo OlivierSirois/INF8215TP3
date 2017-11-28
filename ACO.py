@@ -106,16 +106,16 @@ class ACO(object):
                         
             best_solution_of_iteration = Solution(self.heuristic2opt(best_solution_of_iteration))       
             if best_solution_of_iteration.cost < self.best.cost:
-                self.global_update(self.best)
+                self.global_update(best_solution_of_iteration)
                 #print("best cost till now:", self.best.cost)
             
-            #if m%20 == 0:
+            #if m%25 == 0:
                 
                 #print(m*100/maxiteration, "%")
 
         #self.best.printsol()
         td = time()-t1
-        print("parameters q0 %r,beta %r, rho %r, phi %r, k %r, time %f , cost %r ", self.self.parameter_q0 , self.parameter_beta , self.parameter_rho,   self.parameter_phi , self.parameter_K , td,  self.best.cost )
+        print("parameters q0 %r,beta %r, rho %r, phi %r, k %r, time %f , cost %r " % (self.parameter_q0 , self.parameter_beta , self.parameter_rho,   self.parameter_phi , self.parameter_K , td,  self.best.cost ))
         #print("the cost", self.best.cost) 
            
             
