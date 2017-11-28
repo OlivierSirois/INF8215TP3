@@ -6,47 +6,42 @@ import copy
 from time import time 
 class ACO(object):
     def __init__(self, q0, beta, rho, phi, K, data):
-        self.parameter_q0 = q0
-        self.parameter_beta = beta
-        self.parameter_rho = rho
-        self.parameter_phi = phi
-        self.parameter_K = K
-
-        self.graph = Graph(data)
-        self.best = Solution(self.graph)
-        self.best.cost = 99999999999999
-        self.pheromone_init = np.ones((self.graph.N, self.graph.N))
-        f = open(data + '_init', 'r')
-        self.pheromone_init *= float(f.readline())
-        self.pheromone = np.ones((self.graph.N, self.graph.N))
-
+            self.parameter_q0 = q0
+            self.parameter_beta = beta
+            self.parameter_rho = rho
+            self.parameter_phi = phi
+            self.parameter_K = K
+            
+            self.graph = Graph(data)
+            self.best = Solution(self.graph)
+            self.best.cost = 99999999999999
+            self.pheromone_init = np.ones((self.graph.N, self.graph.N))
+            f = open(data + '_init', 'r')
+            self.pheromone_init *= float(f.readline())
+            self.pheromone = np.ones((self.graph.N, self.graph.N))
+            
     def get_next_city(self, sol):
-
-        q = np.random.rand() 
-        b = self.parameter_beta
-        if len(sol.visited) > 0:
-            source = sol.visited[-1]
-
-        else : 
-            source = 0
-        
-        if len(sol.not_visited) <= 1:
-            return 0
-        else:
-            if q < self.parameter_q0:
-                nv = np.array(sol.not_visited)
-                nv = np.delete(nv, np.where(nv == 0))
-                t = self.pheromone[source][nv]            # pheromone associated to each edge
-                c = self.graph.costs[source][nv] 
-                return nv[np.argmax(t/np.power(c, b))]
-            else:
-                nv = np.array(sol.not_visited)       
-                nv = np.delete(nv, np.where(nv==0))
-                t = self.pheromone[source][nv]                 # pheromone
-                c = np.power(self.graph.costs[source][nv], b)  # cost 
-                sm = np.sum(t/c) 
-                prob = np.divide(np.divide(t, c), sm)
+            q = np.random.rand() # random distribution
+            b = self.parameter_beta # relative importance of pheromone vs distance        
+   
+            if sol.visited: source = sol.visited[-1]
+            else : source = 0
+    
+            if len(sol.not_visited) > 1:
+                nv = np.array(sol.not_visited) 
+                nv = np.delete(nv, np.where(nv==0)) # not visited list
+                t = self.pheromone[source][nv] # pheromone associated to each edge
+                c = np.power(self.graph.costs[source][nv], b) # cost 
+                
+                # If q < q0 then next city is the max argument of t/c. 
+                if q < self.parameter_q0: return nv[np.argmax(t/c)]
+                        
+                # If q > q0 then next city is randomly chosen. 
+                prob = np.divide(np.divide(t, c), np.sum(t/c))
                 return np.random.choice(nv, 1, p=prob)[0]
+       
+            return 0 # next city is 0
+   
 
     # Choose vertex i and an non-consecutive vertex j, invert them and check if
     # the cost of the solution improved. If it did, then that's the new best 
@@ -83,6 +78,7 @@ class ACO(object):
         for j in range(0, len(s)):
             self.pheromone[s[j-1]][s[j]] = (1-phi)*self.pheromone[s[j-1]][s[j]] + phi*self.pheromone_init[s[j-1]][s[j]]
             self.pheromone[s[j]][s[j-1]] = (1-phi)*self.pheromone[s[j]][s[j-1]] + phi*self.pheromone_init[s[j]][s[j-1]]
+    
     def runACO(self, maxiteration):
         t1 = time()
         best_solution_of_iteration = Solution(self.graph)
@@ -93,8 +89,8 @@ class ACO(object):
             for k in range(0, self.parameter_K):
                 solutions = Solution(self.graph)
                 for c_ in range(0, crange):
-                    if (c_ == 0):
-                        source = 0
+                    if (c_ == 0): 
+                    	source = 0
                     else:
                         source = solutions.visited[-1]
                     nc = self.get_next_city(solutions)
@@ -126,3 +122,33 @@ class ACO(object):
 # if __name__ == '__main__':
 #     aco = ACO(0.9, 2, 0.1, 0.1, 10, 'N12.data')
 #     aco.runACO(50)
+
+"""
+    def get_next_city(self, sol):
+
+        q = np.random.rand() 
+        b = self.parameter_beta
+        if len(sol.visited) > 0:
+            source = sol.visited[-1]
+
+        else : 
+            source = 0
+        
+        if len(sol.not_visited) <= 1:
+            return 0
+        else:
+            if q < self.parameter_q0:
+                nv = np.array(sol.not_visited)
+                nv = np.delete(nv, np.where(nv == 0))
+                t = self.pheromone[source][nv]            # pheromone associated to each edge
+                c = self.graph.costs[source][nv] 
+                return nv[np.argmax(t/np.power(c, b))]
+            else:
+                nv = np.array(sol.not_visited)       
+                nv = np.delete(nv, np.where(nv==0))
+                t = self.pheromone[source][nv]                 # pheromone
+                c = np.power(self.graph.costs[source][nv], b)  # cost 
+                sm = np.sum(t/c) 
+                prob = np.divide(np.divide(t, c), sm)
+                return np.random.choice(nv, 1, p=prob)[0]
+"""
