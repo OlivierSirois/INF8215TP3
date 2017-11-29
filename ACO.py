@@ -55,23 +55,26 @@ class ACO(object):
 
     def heuristic2opt(self, sol):
         minimum_local = 0
-        while (minimum_local == 0):
+        iterateur = 0
+        while (minimum_local == 0 and iterateur < 1000):
+            iterateur+=1
             minimum_local = 1
-            for i in range(0, len(sol.visited)-1):
+            for i in range(-1, len(sol.visited)-2):
                 for j in range(i+2, len(sol.visited)-1):
-                     
-                    cost_avant = sol.g.get_edge(sol.visited[i],sol.visited[i+1]).cost + sol.g.get_edge(sol.visited[j-1], sol.visited[j]).cost
+                    #i_p1 = sol.visited[i+1]
+                    cost_avant = cost_apres = 0 
+                    cost_avant = self.graph.costs[sol.visited[i],sol.visited[i+1]] + self.graph.costs[sol.visited[j], sol.visited[j+1]]
                     
-                    cost_apres = sol.g.get_edge(sol.visited[j],sol.visited[i+1]).cost + sol.g.get_edge(sol.visited[j-1], sol.visited[i]).cost  
+                    cost_apres = self.graph.costs[sol.visited[i],sol.visited[j]] + self.graph.costs[sol.visited[i+1], sol.visited[j+1]]
                     delta = cost_apres - cost_avant
 
 
-                    if (cost_apres < cost_avant):
+                    if delta < 0:
                         minimum_local = 0
                         sol.inverser_ville(i, j)
-                        sol.cost +=delta  #delta should be negatif 
+                        sol.cost = sol.cost -cost_avant+ cost_apres  #delta should be negatif 
 
-
+        #print( iterateur)
         return sol
 
 
