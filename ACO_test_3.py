@@ -69,7 +69,7 @@ def test_global_update():
 def test_next_city():
     
     print('testing get next city...')
-    aco = ACO(0.5, 2, 0, 0, 0, 'test')
+    aco = ACO(0.5, 2, 0, 0, 0, 'testa')
     s = Solution(aco.graph)
     #s.add_edge(0,3)
     c1 = 0
@@ -92,36 +92,59 @@ def test_next_city():
 
 def runACO_test(q0,beta, rho, phi, K):
     
-    aco = ACO(q0, beta, rho, phi, K, './tsp/qatar')
-    aco.runACO(250)
+    aco = ACO(q0, beta, rho, phi, K, './tsp/canada')
+    aco.runACO(1000)
     
     
 
 if __name__ == '__main__':
-    q0 = 0.9
-    beta = 2
-    rho = 0.1
-    phi = 0.1
-    K = 10
-    #runACO_test(0.75,3, 0.16, 0.15, 10)
+    q0 = 0.8 # 0.75
+    beta = 4 #2.4
+    rho = 0.85 # 0.15
+    phi = 1 #0.12
+    K = 15
+     
+    
     #test_heuristic2opt()
     #test_global_update()
     #test_local_update()
     #test_next_city()
     
-    beta_list = np.array([2.2,2.4,2.6,2.8,3])
-    q0_list = np.array([0.6,0.65,0.7,0.75,0.8,0.85,0.95]) #,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.85,0.9,0.95])
-    rho_list= np.array([0.12,0.14,0.15,0.16])
-    phi_list = np.array([0.1,0.11,0.13,0.15,0.17])
-    K_list = np.array([5,10,15,20,25])
+    beta_list = np.array([0.01,1.2,1.6,1.8,2,2.2,2.8,3,4,5,10])
+    q0_list = np.array([0,0.1,0.5,0.6,0.7,0.75,0.8,0.85,0.9,0.95,1]) #,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.85,0.9,0.95])
+    rho_list= np.array([0.01,0.05, 0.1 ,0.12, 0.15, 0.2, 0.5,0.8, 0.9, 1])
+    phi_list =np.array([0.01,0.05, 0.1 ,0.12, 0.15, 0.2, 0.5,0.8, 0.9, 1])
+    K_list = np.array([1,5,10,15,25,50,75,100,200])
     
-    for n in range(0,5):  
+    for n in range(0,1):
+        np.random.seed(n)
+        #runACO_test(0.7,1.9,0.9,1, 12)
+        #runACO_test(q0,beta,rho,phi, K)
+        processes = []
+        for n in range(0,5):
+            np.random.seed(n)
+            process = [mp.Process(target=runACO_test, args=(q0, beta, rho, phi, K))]
+            processes.extend(process)      
+        
+            # Run processes
+        i = 1
+        for p in processes:
+                np.random.seed(i) # to make sure we have different results 
+                p.start()
+                i+=1
+    
+            # Exit the completed processes
+        for p in processes:
+                p.join()        
+        
+        
+        """
         processes = []
         for beta in beta_list:
             process = [mp.Process(target=runACO_test, args=(q0, beta, rho, phi, K))]
             processes.extend(process)
         leng = len(processes)
-        print('lenght', leng)
+        print('beta')
             # Run processes
         for p in processes:
                 p.start()
@@ -130,13 +153,15 @@ if __name__ == '__main__':
         for p in processes:
                 p.join()
         
-        beta = 2    
+        beta = 2 
+        
+        np.random.seed(n)
         processes = []
         for q0 in q0_list:
             process = [mp.Process(target=runACO_test, args=(q0, beta, rho, phi, K))]
             processes.extend(process)
         leng = len(processes)
-        print('lenght', leng)
+        print('q0')
             # Run processes
         for p in processes:
                 p.start()
@@ -144,13 +169,14 @@ if __name__ == '__main__':
             # Exit the completed processes
         for p in processes:
                 p.join()        
+        
         q0 = 0.9
         processes = []
         for rho in rho_list:
             process = [mp.Process(target=runACO_test, args=(q0, beta, rho, phi, K))]
             processes.extend(process)
         leng = len(processes)
-        print('lenght', leng)
+        print('rho')
             # Run processes
         for p in processes:
                 p.start()
@@ -165,7 +191,7 @@ if __name__ == '__main__':
             process = [mp.Process(target=runACO_test, args=(q0, beta, rho, phi, K)) for x in range(1)]
             processes.extend(process)
         leng = len(processes)
-        print('lenght', leng)
+        print('phi')
             # Run processes
         for p in processes:
                 p.start()
@@ -180,7 +206,7 @@ if __name__ == '__main__':
             process = [mp.Process(target=runACO_test, args=(q0, beta, rho, phi, K)) for x in range(1)]
             processes.extend(process)
         leng = len(processes)
-        print('lenght', leng)
+        print('k')
             # Run processes
         for p in processes:
                 p.start()
@@ -189,7 +215,7 @@ if __name__ == '__main__':
         for p in processes:
             p.join()             
         K = 10
-    
+        """
     #print("prochaine iteration")
     #aco.runACO(1000)
     #print("prochaine iteration")
