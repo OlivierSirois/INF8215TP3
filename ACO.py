@@ -56,7 +56,7 @@ class ACO(object):
     def heuristic2opt(self, sol):
         minimum_local = 0
         iterateur = 0
-        while (minimum_local == 0 and iterateur < 1000):
+        while (minimum_local == 0 ):
             iterateur+=1
             minimum_local = 1
             for i in range(-1, len(sol.visited)-2):
@@ -93,11 +93,14 @@ class ACO(object):
             self.pheromone[s[j-1]][s[j]] = (1-phi)*self.pheromone[s[j-1]][s[j]] + phi*self.pheromone_init[s[j-1]][s[j]]
             self.pheromone[s[j]][s[j-1]] = (1-phi)*self.pheromone[s[j]][s[j-1]] + phi*self.pheromone_init[s[j]][s[j-1]]
     def runACO(self, maxiteration):
-        t1 = time()
+        optimal = 1290319
+        
         best_solution_of_iteration = Solution(self.graph)
         solutions = Solution(self.graph)
         crange = len(solutions.not_visited)
-        
+        id_since_improvement = 0
+        id_best = 0
+        t1 = time()
         for m in range(0,maxiteration):
             for k in range(0, self.parameter_K):
                 solutions = Solution(self.graph)
@@ -115,18 +118,22 @@ class ACO(object):
                     if solutions.cost < best_solution_of_iteration.cost: #do the heuristic only on the best solution of the iteration
                         best_solution_of_iteration = Solution(solutions)
                         
-                        
+                       
             best_solution_of_iteration = Solution(self.heuristic2opt(best_solution_of_iteration))       
             if best_solution_of_iteration.cost < self.best.cost:
                 self.global_update(best_solution_of_iteration)
+                id_best = m
                 #print("best cost till now:", self.best.cost)
-            
-            #if m%25 == 0:
-                
+            td = time()-t1
+            if m%100 == 0:
+                id_since_improvement = m - id_best
+                gap_best = 100*(self.best.cost - optimal)/optimal
+                print ("iteration, :%i , gap_best, %r, id_without_improvement, %i , CPU , %r" %(m, gap_best,id_since_improvement, td))
                 #print(m*100/maxiteration, "%")
 
         #self.best.printsol()
         td = time()-t1
+        
         print("parameters q0 %r,beta %r, rho %r, phi %r, k %r, time %f , cost %r " % (self.parameter_q0 , self.parameter_beta , self.parameter_rho,   self.parameter_phi , self.parameter_K , td,  self.best.cost ))
         #print("the cost", self.best.cost) 
            
