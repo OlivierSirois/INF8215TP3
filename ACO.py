@@ -82,7 +82,7 @@ class ACO(object):
         #print( iterateur)
         return sol
 
-
+    #update globale, on update nos pheromones en fonction de la methode decrite dans l'enoncer
     def global_update(self, sol):
         self.best = Solution(sol)
         s = sol.visited 
@@ -90,13 +90,16 @@ class ACO(object):
         for j in range(0, len(s)): 
             self.pheromone[s[j-1]][s[j]] += self.parameter_rho / self.best.cost
             self.pheromone[s[j]][s[j-1]] += self.parameter_rho / self.best.cost
-        
+
+    #update locale, on update nos pheromones localement en fonction de la methode decrite dans l'enoncer
     def local_update(self, sol):
         s = sol.visited 
         phi = self.parameter_phi 
         for j in range(0, len(s)):
             self.pheromone[s[j-1]][s[j]] = (1-phi)*self.pheromone[s[j-1]][s[j]] + phi*self.pheromone_init[s[j-1]][s[j]]
             self.pheromone[s[j]][s[j-1]] = (1-phi)*self.pheromone[s[j]][s[j-1]] + phi*self.pheromone_init[s[j]][s[j-1]]
+
+    #notre algorithme, on fait notre algorithme comme specifier dans le pseudocode
     def runACO(self, maxiteration):
         optimal = 1290319
         
@@ -106,8 +109,11 @@ class ACO(object):
         id_since_improvement = 0
         id_best = 0
         t1 = time()
+        #on roule pour le nombre maximum d'iterations
         for m in range(0,maxiteration):
+            #on simule chaque fourmir
             for k in range(0, self.parameter_K):
+                #on construit une solution par fourmi
                 solutions = Solution(self.graph)
                 for c_ in range(0, crange):
                     if (c_ == 0):
@@ -116,6 +122,7 @@ class ACO(object):
                         source = solutions.visited[-1]
                     nc = self.get_next_city(solutions)
                     solutions.add_edge(source, nc)
+                #apres avoir finit la solution, on fait un update locale
                 self.local_update(solutions)
                 if k == 0:
                     best_solution_of_iteration = Solution(solutions)
@@ -126,6 +133,7 @@ class ACO(object):
                        
             best_solution_of_iteration = Solution(self.heuristic2opt(best_solution_of_iteration))       
             if best_solution_of_iteration.cost < self.best.cost:
+                #on fait notre update globale
                 self.global_update(best_solution_of_iteration)
                 id_best = m
             td = time()-t1
