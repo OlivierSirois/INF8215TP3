@@ -19,26 +19,31 @@ class ACO(object):
         f = open(data + '_init', 'r')
         self.pheromone_init *= float(f.readline())
         self.pheromone = np.ones((self.graph.N, self.graph.N))
-
+    #on choisit la prochaine villes de notre soluiton en fonction de la pheromone avec une chance d'avoir une villes choisi au hasard.
     def get_next_city(self, sol):
-
+        #On specifie une variable aleatoire q entre 0 et 1
         q = np.random.rand() 
         b = self.parameter_beta
+
+        #dans le cas ou on a visiter des villes, on prend la derniere comme etant la source pour notre prochaine aretes
         if len(sol.visited) > 0:
             source = sol.visited[-1]
-
+        #sinon, on place la source a 0
         else : 
             source = 0
-        
+        #si on a visiter toutes les villes, on donne comme notre prochaine ville la destination de 0
         if len(sol.not_visited) <= 1:
             return 0
+        #si il nous reste des villes
         else:
+            #nous avons une chance qu'on choississe une ville en fonction l'enoncer 1 du TP
             if q < self.parameter_q0:
                 nv = np.array(sol.not_visited)
                 nv = np.delete(nv, np.where(nv == 0))
                 t = self.pheromone[source][nv]            # pheromone associated to each edge
                 c = self.graph.costs[source][nv] 
                 return nv[np.argmax(t/np.power(c, b))]
+            #nous avons aussi une chance qu'on choississe une ville aleatoirement en fonction de la pheromone, l'enoncer 2 du TP
             else:
                 nv = np.array(sol.not_visited)       
                 nv = np.delete(nv, np.where(nv==0))
@@ -123,7 +128,6 @@ class ACO(object):
             if best_solution_of_iteration.cost < self.best.cost:
                 self.global_update(best_solution_of_iteration)
                 id_best = m
-                #print("best cost till now:", self.best.cost)
             td = time()-t1
             if m%100 == 0:
                 id_since_improvement = m - id_best
